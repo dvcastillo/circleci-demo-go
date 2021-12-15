@@ -33,7 +33,7 @@ jobs: # basic units of work in a run
           name: Waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       
-      -- go/test:
+      - go/test:
           covermode: atomic
           failfast: true
           race: true
