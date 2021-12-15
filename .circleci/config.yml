@@ -48,7 +48,7 @@ jobs: # basic units of work in a run
 
       - go/save-cache:
           key: go-mod-v4
-          paths:
+          path:
             - "/go/pkg/mod"
 
       - run:
