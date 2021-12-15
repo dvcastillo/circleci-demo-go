@@ -46,7 +46,7 @@ jobs: # basic units of work in a run
 
       - run: make # pull and build dependencies for the project
 
-      - go/save_cache:
+      - go/save-cache:
           key: go-mod-v4
           paths:
             - "/go/pkg/mod"
