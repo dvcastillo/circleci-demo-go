@@ -1,6 +1,11 @@
-version: 2 # use CircleCI 2.0
+version: 2.1 # use CircleCI 2.0
+orbs:
+  go: circleci/go@1.7.0
 jobs: # basic units of work in a run
   build: # runs not using Workflows must have a `build` job as entry point
+    executor:
+      name: go/default
+      tag: '1.16'
     docker: # run the steps with Docker
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.17
@@ -27,17 +32,22 @@ jobs: # basic units of work in a run
       - run:
           name: Waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      
+      -- go/test:
+          covermode: atomic
+          failfast: true
+          race: true
 
-      - run:
-          name: Run unit tests
-          environment: # environment variables for the database url and path to migration files
-            CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
-            CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
+      # - run:
+      #     name: Run unit tests
+      #     environment: # environment variables for the database url and path to migration files
+      #       CONTACTS_DB_URL: "postgres://circleci-demo-go@localhost:5432/circle_test?sslmode=disable"
+      #       CONTACTS_DB_MIGRATIONS: /home/circleci/project/db/migrations
 
-          # store the results of our tests in the $TEST_RESULTS directory
-          command: |
-            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
+      #     # store the results of our tests in the $TEST_RESULTS directory
+      #     command: |
+      #       PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+      #       gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
 
       - run: make # pull and build dependencies for the project
 
